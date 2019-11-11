@@ -5,43 +5,12 @@
 #include <iostream>
 
 #include "../src/graph.h"
+#include "util.h"
 
 #define DEBUG(x)
 
 
 using namespace std;
-
-
-void print(vector<set<int>> v) {
-	cout << "{ ";
-	for (auto const &s : v) {
-		cout << "{";
-		for (auto elem : s) {
-			cout << elem << ", ";
-		}
-		cout << "}, ";
-	}
-	cout << "}";
-}
-
-void print(vector<int> &v) {
-	cout << "{ ";
-	for (int i = 0; i < v.size(); ++i) {
-		cout << v[i];
-		if (i < v.size() - 1)
-			cout << ", ";
-	}
-	cout << " }" << endl;
-}
-
-
-void print(set<int> v) {
-	cout << "{ ";
-	for (auto elem : v) {
-		cout << elem << ", ";
-	}
-	cout << " }" << endl;
-}
 
 
 TEST(GraphTest, GraphCreation) {
@@ -58,10 +27,4 @@ TEST(GraphTest, GraphCreation) {
 		DEBUG(print(neighbors));
 		ASSERT_EQ(neighbors, expectedAdjacencyList[v]);
 	}
-}
-
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }
