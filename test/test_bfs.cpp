@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "../src/bfs_cpu.h"
-#include "../src/bfs_gpu.h"
+#include "../src/bfs_gpu.cuh"
 #include "util.h"
 
 #define DEBUG(x)

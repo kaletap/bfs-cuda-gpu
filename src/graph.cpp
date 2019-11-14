@@ -6,6 +6,11 @@
 using namespace std;
 
 
+Graph::Graph() {
+	return;
+}
+
+
 Graph::Graph(int numVertices, vector<pair<int, int>> edges) {
 	int numEdges = edges.size();
 
