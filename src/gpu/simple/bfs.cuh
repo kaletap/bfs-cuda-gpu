@@ -3,7 +3,7 @@
 
 #include <bits/stdc++.h>
 
-#include "graph.h"
+#include "../../graph/graph.h"
 
 /*
  * start - vertex number from which traversing a graph starts

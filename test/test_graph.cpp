@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <iostream>
 
-#include "../src/graph.h"
+#include "../src/graph/graph.h"
 #include "util.h"
 
 #define DEBUG(x)

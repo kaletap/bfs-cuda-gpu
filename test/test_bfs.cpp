@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "../src/bfs_cpu.h"
-#include "../src/bfs_gpu.cuh"
+#include "../src/cpu/bfs.h"
+#include "../src/gpu/simple/bfs.cuh"
 #include "util.h"
 
 #define DEBUG(x)

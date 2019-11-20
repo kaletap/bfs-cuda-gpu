@@ -1,4 +1,4 @@
-#include "bfs_gpu.cuh"
+#include "bfs.cuh"
 
 using namespace std;
 

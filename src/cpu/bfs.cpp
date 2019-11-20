@@ -1,4 +1,4 @@
-#include "bfs_cpu.h"
+#include "bfs.h"
 
 using namespace std;
 

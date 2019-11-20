@@ -5,15 +5,11 @@ This projects aims to implement Breadth First Search Algorithm on CUDA which wou
 Nvidia paper: https://research.nvidia.com/publication/scalable-gpu-graph-traversal (Merrill, Garland, Grimshaw)
 
 ## Goals:
-1.1 Create Graph class 
-1.2 Test Graph class 
-2.1 Implement sequential BFS
-2.2 Test sequential BFS
-3.1 Implement (simple) parallel BFS with CUDA
-3.2 Test (simple) parallel BFS
-4.1 Implement Merill parallel BFS with CUDA
-4.2 Test Merill parallel BFS
-5.1 Performance comparison and conclusions
+1. Create Graph class and test it
+2. Implement sequential BFS and test it
+3. Implement (simple) parallel BFS with CUDA and test it
+4. Implement Merill parallel BFS with CUDA and test it
+5. Performance comparison and conclusions
 
 ## Parallelization strategy
 
