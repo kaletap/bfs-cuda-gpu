@@ -2,6 +2,7 @@
 
 using namespace std;
 
+#define DEBUG(x)
 #define N 16
 
 
@@ -36,13 +37,13 @@ void computeNextQueue(int *adjacencyList, int *edgesOffset, int *edgesSize, int 
 	if (tid < queueSize) {  // visit all vertexes in a queue in parallel
 		int current = currentQueue[tid];
 		for (int i = edgesOffset[current]; i < edgesOffset[current] + edgesSize[current]; ++i) {
-			printf("tid %i: i = %i \n", tid, i);
+			DEBUG(printf("tid %i: i = %i \n", tid, i));
 			int v = adjacencyList[i];
-			printf("tid %i: Currently considering vertex %i. distance = %i \n", tid, v, distance[v]);
+			DEBUG(printf("tid %i: Currently considering vertex %i. distance = %i \n", tid, v, distance[v]));
 			if (distance[v] == INT_MAX) {
 				distance[v] = level + 1;
 				int position = atomicAdd(nextQueueSize, 1);
-				printf("Adding %i to the position %i of the queue \n", v, position);
+				DEBUG(printf("Adding %i to the position %i of the queue \n", v, position));
 				nextQueue[position] = v;
 			}
 		}
