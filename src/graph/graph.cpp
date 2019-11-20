@@ -6,8 +6,46 @@
 using namespace std;
 
 
-Graph::Graph() {
-	return;
+Graph::Graph(Format format, Direction direction) {
+	switch (format) {
+		case Empty:
+			return;
+			break;
+		case Edges: {
+			int numVertices, numEdges;
+			vector<vector<int>> adjacencyList(numVertices);
+			cin >> numVertices >> numEdges;
+			int v, w;
+			for (int i = 0; i < numEdges; ++i) {
+				cin >> v >> w;
+				adjacencyList[v].push_back(w);
+				if (direction == Undirected)
+					adjacencyList[w].push_back(v);
+			}
+			this->init(adjacencyList, numEdges);
+			break;
+		}
+		case AdjacencyList: {
+			int numVertices, numEdges;
+			cin >> numVertices >> numEdges;
+			vector<vector<int>> adjacencyList(numVertices);
+			string line;
+			for (int v = 0; v < numVertices; ++v) {
+				getline(cin, line);
+				stringstream splitter(line);
+				int w;
+				while (splitter >> v) {
+					adjacencyList[v].push_back(w);
+					if (direction == Undirected)
+						adjacencyList[w].push_back(v);
+				}
+			}
+			this->init(adjacencyList, numEdges);
+			break;
+		}
+	}
+
+
 }
 
 
@@ -22,6 +60,25 @@ Graph::Graph(int numVertices, vector<pair<int, int>> edges) {
 		adjacencyList.at(edge.second).push_back(edge.first);
 	}
 
+	this->init(adjacencyList, numEdges);
+}
+
+
+
+Graph::Graph(vector<vector<int>> adjacencyList) {
+	int numEdges = 0;
+	for (auto const &neighbors : adjacencyList) {
+		for (int v : neighbors) {
+			++numEdges;
+		}
+	}
+	this->init(adjacencyList, numEdges);
+}
+
+
+
+void Graph::init(vector<vector<int>> adjacencyList, int numEdges) {
+	const int numVertices = adjacencyList.size();
 	// Creation of single vector adjacency list
 	for (int i = 0; i < numVertices; ++i) {
 		this->edgesOffset.push_back(this->adjacencyList.size());
@@ -30,8 +87,10 @@ Graph::Graph(int numVertices, vector<pair<int, int>> edges) {
 			this->adjacencyList.push_back(v);
 		}
 	}
-
 	this->numVertices = numVertices;
 	this->numEdges = numEdges;
 }
+
+
+
 

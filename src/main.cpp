@@ -1,13 +1,13 @@
 #include <iostream>
 
-#include "graph.h"
+#include "graph/graph.h"
 
 using namespace std;
 
-int main() {
-	cout << "Hello world" << endl;
 
-	Graph G();
+// Tests speed of a BFS algorithm for
+int main() {
+	Graph G(Empty);
 
 	return 0;
 }
