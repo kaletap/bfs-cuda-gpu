@@ -2,6 +2,7 @@
 #define GRAPH_H
 
 #include <vector>
+#include <string>
 #include <iostream>
 #include <sstream>
 
@@ -18,6 +19,8 @@ public:
     std::vector<int> edgesSize; // number of edges for every vertex
     int numVertices;
     int numEdges;
+
+    void print();
 
 private:
     Graph(std::vector<std::vector<int>> adjacencyList);

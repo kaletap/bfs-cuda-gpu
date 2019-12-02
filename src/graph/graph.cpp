@@ -1,9 +1,10 @@
-#include <ctime>
-
 #include "graph.h"
 
 
 using namespace std;
+
+
+void print_vector(string title, vector<int> &v);
 
 
 Graph::Graph(Format format, Direction direction) {
@@ -13,20 +14,24 @@ Graph::Graph(Format format, Direction direction) {
 			break;
 		case Edges: {
 			int numVertices, numEdges;
-			vector<vector<int>> adjacencyList(numVertices);
+			cout << "Started reading graph" << endl;
 			cin >> numVertices >> numEdges;
+			vector<vector<int>> adjacencyList(numVertices);
 			int v, w;
 			for (int i = 0; i < numEdges; ++i) {
 				cin >> v >> w;
 				adjacencyList[v].push_back(w);
-				if (direction == Undirected)
+				if (direction == Undirected) {
 					adjacencyList[w].push_back(v);
+				}
 			}
 			this->init(adjacencyList, numEdges);
+			cout << "Finished reading graph" << endl;
 			break;
 		}
 		case AdjacencyList: {
 			int numVertices, numEdges;
+			cout << "Started reading graph" << endl;
 			cin >> numVertices >> numEdges;
 			vector<vector<int>> adjacencyList(numVertices);
 			string line;
@@ -36,11 +41,14 @@ Graph::Graph(Format format, Direction direction) {
 				int w;
 				while (splitter >> v) {
 					adjacencyList[v].push_back(w);
-					if (direction == Undirected)
+					if (direction == Undirected) {
+						cerr << "Warning: You are reading graph using adjacency list as undirected";
 						adjacencyList[w].push_back(v);
+					}
 				}
 			}
 			this->init(adjacencyList, numEdges);
+			cout << "Finished reading graph" << endl;
 			break;
 		}
 	}
@@ -76,7 +84,6 @@ Graph::Graph(vector<vector<int>> adjacencyList) {
 }
 
 
-
 void Graph::init(vector<vector<int>> adjacencyList, int numEdges) {
 	const int numVertices = adjacencyList.size();
 	// Creation of single vector adjacency list
@@ -92,5 +99,20 @@ void Graph::init(vector<vector<int>> adjacencyList, int numEdges) {
 }
 
 
+void Graph::print() {
+	printf("Graph(numVertices = %i, numEdges = %i)\n", numVertices, numEdges);
+	print_vector("AdjacencyList:", adjacencyList);
+	print_vector("edgesOffset:", edgesOffset);
+	print_vector("edgesSize:", edgesSize);
+}
 
 
+void print_vector(string title, vector<int> &v) {
+	cout << title << " { ";
+	for (int i = 0; i < v.size(); ++i) {
+		cout << v[i];
+		if (i < v.size() - 1)
+			cout << ", ";
+	}
+	cout << " }" << endl;
+}

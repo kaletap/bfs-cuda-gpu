@@ -1,4 +1,4 @@
-#include "bfs.cuh"
+#include "bfs_simple.cuh"
 
 using namespace std;
 
@@ -102,7 +102,6 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 		}
 		computeNextQueue<<<N, 1>>> (d_adjacencyList, d_edgesOffset, d_edgesSize, d_distance,
 				currentQueueSize, d_currentQueue, d_nextQueueSize, d_nextQueue, level);
-		cudaDeviceSynchronize();
 		++level;
 		cudaMemcpy(&currentQueueSize, d_nextQueueSize, sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(d_nextQueueSize, &nextQueueSize, sizeof(int), cudaMemcpyHostToDevice);

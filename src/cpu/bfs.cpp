@@ -4,6 +4,7 @@ using namespace std;
 
 
 void bfsCPU(int start, Graph &G, std::vector<int> &distance, std::vector<bool> &visited) {
+	fill(distance.begin(), distance.end(), INT_MAX);
 	distance[start] = 0;
 	visited[start] = true;
 	queue<int> to_visit;

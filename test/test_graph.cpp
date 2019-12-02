@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "../src/graph/graph.h"
-#include "util.h"
 
 #define DEBUG(x)
 

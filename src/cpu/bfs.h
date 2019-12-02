@@ -1,8 +1,10 @@
 #ifndef BFS_CPU_H
 #define BFS_CPU_H
 
-#include "../graph/graph.h"
 #include <queue>
+#include <bits/stdc++.h>
+
+#include "../graph/graph.h"
 
 /*
  * start - vertex number from which traversing a graph starts

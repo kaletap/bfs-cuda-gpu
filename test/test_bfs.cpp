@@ -2,8 +2,7 @@
 #include <vector>
 
 #include "../src/cpu/bfs.h"
-#include "../src/gpu/simple/bfs.cuh"
-#include "util.h"
+#include "../src/gpu/simple/bfs_simple.cuh"
 
 #define DEBUG(x)
 
@@ -25,6 +24,17 @@ protected:
 	vector<int> expectedDistance;
 	vector<bool> expectedVisited;
 };
+
+
+void print(vector<int> &v) {
+	cout << "{ ";
+	for (int i = 0; i < v.size(); ++i) {
+		cout << v[i];
+		if (i < v.size() - 1)
+			cout << ", ";
+	}
+	cout << " }" << endl;
+}
 
 
 TEST_F(BFSTest, BFS_CPU_Test_start0) {
