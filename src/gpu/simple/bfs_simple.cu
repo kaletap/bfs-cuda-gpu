@@ -3,7 +3,8 @@
 using namespace std;
 
 #define DEBUG(x)
-#define N 16
+#define N_THREADS_PER_BLOCK 1 << 1 // Linear increase in exponent -> exponential increase in time: WHAT
+
 
 
 __global__
@@ -33,7 +34,7 @@ void printDeviceArray(int *d_arr, int n) {
 __global__
 void computeNextQueue(int *adjacencyList, int *edgesOffset, int *edgesSize, int *distance,
 		int queueSize, int *currentQueue, int *nextQueueSize, int *nextQueue, int level) {
-	int tid = blockIdx.x * blockDim.x + threadIdx.x;  // thread id
+	const int tid = blockIdx.x * blockDim.x + threadIdx.x;  // thread id
 	if (tid < queueSize) {  // visit all vertexes in a queue in parallel
 		int current = currentQueue[tid];
 		for (int i = edgesOffset[current]; i < edgesOffset[current] + edgesSize[current]; ++i) {
@@ -53,6 +54,8 @@ void computeNextQueue(int *adjacencyList, int *edgesOffset, int *edgesSize, int 
 
 void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 
+	const int n_blocks = (G.numVertices + N_THREADS_PER_BLOCK - 1) / N_THREADS_PER_BLOCK;
+
 	// Initialization of GPU variables
 	int *d_adjacencyList;
 	int *d_edgesOffset;
@@ -64,7 +67,7 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 
 	// Initialization of CPU variables
 	int currentQueueSize = 1;
-	const int nextQueueSize = 0;
+	const int NEXT_QUEUE_SIZE = 0;
 	int level = 0;
 
 	// Allocation on device
@@ -82,12 +85,13 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 	cudaMemcpy(d_adjacencyList, &G.adjacencyList[0], adjacencySize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edgesOffset, &G.edgesOffset[0], size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edgesSize, &G.edgesSize[0], size, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_nextQueueSize, &nextQueueSize, sizeof(int), cudaMemcpyHostToDevice);
-	//change_elem<<<1, 1>>> (d_firstQueue, 0, start);
+	cudaMemcpy(d_nextQueueSize, &NEXT_QUEUE_SIZE, sizeof(int), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_firstQueue, &start, sizeof(int), cudaMemcpyHostToDevice);
-	// d_distance
-	initializeDeviceArray<<<N, 1>>> (G.numVertices, d_distance, INT_MAX, start);
-	cudaDeviceSynchronize();
+//	initializeDeviceArray<<<n_blocks, N_THREADS_PER_BLOCK>>> (G.numVertices, d_distance, INT_MAX, start); // FOR SOME REASON USING THIS KERNEL DOESNT WORK
+//	cudaDeviceSynchronize();
+	distance = vector<int> (G.numVertices, INT_MAX);
+	distance[start] = 0;
+	cudaMemcpy(d_distance, distance.data(), size, cudaMemcpyHostToDevice);
 
 	while (currentQueueSize > 0) {
 		int *d_currentQueue;
@@ -100,12 +104,14 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 			d_currentQueue = d_secondQueue;
 			d_nextQueue = d_firstQueue;
 		}
-		computeNextQueue<<<N, 1>>> (d_adjacencyList, d_edgesOffset, d_edgesSize, d_distance,
+		computeNextQueue<<<n_blocks, N_THREADS_PER_BLOCK>>> (d_adjacencyList, d_edgesOffset, d_edgesSize, d_distance,
 				currentQueueSize, d_currentQueue, d_nextQueueSize, d_nextQueue, level);
+		cudaDeviceSynchronize();
 		++level;
 		cudaMemcpy(&currentQueueSize, d_nextQueueSize, sizeof(int), cudaMemcpyDeviceToHost);
-		cudaMemcpy(d_nextQueueSize, &nextQueueSize, sizeof(int), cudaMemcpyHostToDevice);
-//		cout << "End of loop on the host, currentQueueSize: " << currentQueueSize << endl;
+		cudaMemcpy(d_nextQueueSize, &NEXT_QUEUE_SIZE, sizeof(int), cudaMemcpyHostToDevice);
+		DEBUG(printf("End of loop on the host, currentQueueSize: %i\n", currentQueueSize));
+		cudaMemcpy(&distance[0], d_distance, size, cudaMemcpyDeviceToHost);
 	}
 
 	cudaMemcpy(&distance[0], d_distance, size, cudaMemcpyDeviceToHost);
@@ -116,4 +122,5 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 	cudaFree(d_edgesSize);
 	cudaFree(d_firstQueue);
 	cudaFree(d_secondQueue);
+	cudaFree(d_distance);
 }

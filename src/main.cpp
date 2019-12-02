@@ -23,6 +23,7 @@ public:
 			if (answer.at(i) != expected_answer.at(i)) {
 				is_ok = false;
 				position_wrong = i;
+				break;
 			}
 		}
 		if (is_ok) {
@@ -30,7 +31,7 @@ public:
 		}
 		else {
 			printf("Something went wrong!\n");
-			printf("Answer at %i equals %i but should be equal to %i", position_wrong, answer[position_wrong], expected_answer[position_wrong]);
+			printf("Answer at %i equals %i but should be equal to %i\n", position_wrong, answer[position_wrong], expected_answer[position_wrong]);
 		}
 	}
 };
@@ -38,12 +39,10 @@ public:
 
 // Tests speed of a BFS algorithm
 int main() {  // TODO: Add arguments to main program (type of graph, file path)
-	Graph G(Edges, Undirected);
+	Graph G(AdjacencyList, Directed);
 	int startVertex;
 	vector<int> distance;
 	vector<bool> visited;
-
-	G.print();
 
 	startVertex = 1;
 
@@ -52,7 +51,7 @@ int main() {  // TODO: Add arguments to main program (type of graph, file path)
 	visited = vector<bool>(G.numVertices);
 	auto startTime = chrono::steady_clock::now();
 	bfsCPU(startVertex, G, distance, visited);
-	auto endTime = std::chrono::steady_clock::now();
+	auto endTime = chrono::steady_clock::now();
 	long duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
 	printf("Elapsed time for CPU implementation : %li ms.\n", duration);
 

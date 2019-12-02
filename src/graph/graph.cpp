@@ -39,7 +39,7 @@ Graph::Graph(Format format, Direction direction) {
 				getline(cin, line);
 				stringstream splitter(line);
 				int w;
-				while (splitter >> v) {
+				while (splitter >> w) {
 					adjacencyList[v].push_back(w);
 					if (direction == Undirected) {
 						cerr << "Warning: You are reading graph using adjacency list as undirected";
