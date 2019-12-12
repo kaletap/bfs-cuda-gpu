@@ -4,6 +4,7 @@
 #include "graph/graph.h"
 #include "cpu/bfs.h"
 #include "gpu/simple/bfs_simple.cuh"
+#include "gpu/quadratic/bfs_quadratic.cuh"
 
 using namespace std;
 
@@ -15,6 +16,21 @@ class Checker {
 	vector<int> expected_answer;
 public:
 	Checker(vector<int> exp_ans): expected_answer(exp_ans) {}
+
+	pair<int, int> count_visited_vertices(const vector<int> &distance) {
+		int depth = 0;
+		int count = 0;
+		for (int x : distance) {
+			if (x < INT_MAX) {
+				++count;
+				if (x > depth) {
+					depth = x;
+				}
+			}
+		}
+		return {count, depth};
+	}
+
 	void check(vector<int> answer) {
 		assert(answer.size() == expected_answer.size());
 		bool is_ok = true;
@@ -27,7 +43,10 @@ public:
 			}
 		}
 		if (is_ok) {
-			printf("CHECKED SUCCESSFULY!\n");
+			pair<int, int> graph_output = count_visited_vertices(answer);
+			int n_visited_vertices = graph_output.first;
+			int depth = graph_output.second;
+			printf("CHECKED SUCCESSFULY! Number of visited vertices: %i, depth: %i \n", n_visited_vertices, depth);
 		}
 		else {
 			printf("Something went wrong!\n");
@@ -59,14 +78,24 @@ int main() {  // TODO: Add arguments to main program (type of graph, file path)
 
 	// Simple GPU
 	distance = vector<int>(G.numVertices);
-	visited = vector<bool>(G.numVertices);
 	startTime = chrono::steady_clock::now();
 	bfsGPU(startVertex, G, distance, visited);
 	endTime = std::chrono::steady_clock::now();
 	duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
-	printf("Elapsed time for naive linear GPU implementation : %li ms.\n", duration);
+	printf("Elapsed time for naive linear GPU implementation (with graph copying) : %li ms.\n", duration);
 
 	checker.check(distance);
+
+	// Quadratic GPU
+	distance = vector<int>(G.numVertices);
+	startTime = chrono::steady_clock::now();
+	bfsGPUQuadratic(startVertex, G, distance, visited);
+	endTime = std::chrono::steady_clock::now();
+	duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+	printf("Elapsed time for quadratic GPU implementation (with graph copying) : %li ms.\n", duration);
+
+	checker.check(distance);
+//	print(distance);
 
 	return 0;
 }

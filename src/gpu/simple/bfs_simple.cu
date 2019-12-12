@@ -51,6 +51,7 @@ void computeNextQueue(int *adjacencyList, int *edgesOffset, int *edgesSize, int 
 
 void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 
+
 	const int n_blocks = (G.numVertices + N_THREADS_PER_BLOCK - 1) / N_THREADS_PER_BLOCK;
 
 	// Initialization of GPU variables
@@ -61,6 +62,7 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 	int *d_secondQueue;
 	int *d_nextQueueSize;
 	int *d_distance; // output
+
 
 	// Initialization of CPU variables
 	int currentQueueSize = 1;
@@ -78,7 +80,9 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 	cudaMalloc((void **)&d_distance, size);
 	cudaMalloc((void **)&d_nextQueueSize, sizeof(int));
 
+
 	// Copy inputs to device
+
 	cudaMemcpy(d_adjacencyList, &G.adjacencyList[0], adjacencySize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edgesOffset, &G.edgesOffset[0], size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edgesSize, &G.edgesSize[0], size, cudaMemcpyHostToDevice);
@@ -86,9 +90,10 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 	cudaMemcpy(d_firstQueue, &start, sizeof(int), cudaMemcpyHostToDevice);
 //	initializeDeviceArray<<<n_blocks, N_THREADS_PER_BLOCK>>> (G.numVertices, d_distance, INT_MAX, start); // FOR SOME REASON USING THIS KERNEL DOESNT WORK
 //	cudaDeviceSynchronize();
+
+	auto startTime = chrono::steady_clock::now();
 	distance = vector<int> (G.numVertices, INT_MAX);
 	distance[start] = 0;
-	auto startTime = chrono::steady_clock::now();
 	cudaMemcpy(d_distance, distance.data(), size, cudaMemcpyHostToDevice);
 
 	while (currentQueueSize > 0) {

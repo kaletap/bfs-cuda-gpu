@@ -3,7 +3,7 @@
 using namespace std;
 
 #define DEBUG(x)
-#define N_THREADS_PER_BLOCK (1 << 2)
+#define N_THREADS_PER_BLOCK (1 << 5)
 
 
 
@@ -55,6 +55,8 @@ void bfsGPUQuadratic(int start, Graph &G, vector<int> &distance, vector<bool> &v
 	cudaMemcpy(d_adjacencyList, &G.adjacencyList[0], adjacencySize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edgesOffset, &G.edgesOffset[0], size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edgesSize, &G.edgesSize[0], size, cudaMemcpyHostToDevice);
+	auto startTime = chrono::steady_clock::now();
+	distance = vector<int>(G.numVertices, INT_MAX);
 	distance[start] = 0;
 	cudaMemcpy(d_distance, distance.data(), size, cudaMemcpyHostToDevice);
 
@@ -72,6 +74,9 @@ void bfsGPUQuadratic(int start, Graph &G, vector<int> &distance, vector<bool> &v
 
 	// Copying output back to host
 	cudaMemcpy(&distance[0], d_distance, size, cudaMemcpyDeviceToHost);
+	auto endTime = std::chrono::steady_clock::now();
+	auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+	printf("Elapsed time for quadratic GPU implementation (without copying graph) : %li ms.\n", duration);
 
 	// Cleanup
 	cudaFree(d_adjacencyList);
