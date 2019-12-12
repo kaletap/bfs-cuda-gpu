@@ -3,7 +3,7 @@
 using namespace std;
 
 #define DEBUG(x)
-#define N_THREADS_PER_BLOCK 1 << 1 // Linear increase in exponent -> exponential increase in time: WHAT
+#define N_THREADS_PER_BLOCK (1 << 5)
 
 
 
@@ -38,13 +38,10 @@ void computeNextQueue(int *adjacencyList, int *edgesOffset, int *edgesSize, int 
 	if (tid < queueSize) {  // visit all vertexes in a queue in parallel
 		int current = currentQueue[tid];
 		for (int i = edgesOffset[current]; i < edgesOffset[current] + edgesSize[current]; ++i) {
-			DEBUG(printf("tid %i: i = %i \n", tid, i));
 			int v = adjacencyList[i];
-			DEBUG(printf("tid %i: Currently considering vertex %i. distance = %i \n", tid, v, distance[v]));
 			if (distance[v] == INT_MAX) {
 				distance[v] = level + 1;
 				int position = atomicAdd(nextQueueSize, 1);
-				DEBUG(printf("Adding %i to the position %i of the queue \n", v, position));
 				nextQueue[position] = v;
 			}
 		}
@@ -91,6 +88,7 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 //	cudaDeviceSynchronize();
 	distance = vector<int> (G.numVertices, INT_MAX);
 	distance[start] = 0;
+	auto startTime = chrono::steady_clock::now();
 	cudaMemcpy(d_distance, distance.data(), size, cudaMemcpyHostToDevice);
 
 	while (currentQueueSize > 0) {
@@ -110,11 +108,12 @@ void bfsGPU(int start, Graph &G, vector<int> &distance, vector<bool> &visited) {
 		++level;
 		cudaMemcpy(&currentQueueSize, d_nextQueueSize, sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(d_nextQueueSize, &NEXT_QUEUE_SIZE, sizeof(int), cudaMemcpyHostToDevice);
-		DEBUG(printf("End of loop on the host, currentQueueSize: %i\n", currentQueueSize));
-		cudaMemcpy(&distance[0], d_distance, size, cudaMemcpyDeviceToHost);
 	}
 
 	cudaMemcpy(&distance[0], d_distance, size, cudaMemcpyDeviceToHost);
+	auto endTime = std::chrono::steady_clock::now();
+	auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+	printf("Elapsed time for naive linear GPU implementation (without copying graph) : %li ms.\n", duration);
 
 	// Cleanup
 	cudaFree(d_adjacencyList);

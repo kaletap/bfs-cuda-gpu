@@ -3,7 +3,7 @@
 using namespace std;
 
 #define DEBUG(x)
-#define N_THREADS_PER_BLOCK 1 << 2
+#define N_THREADS_PER_BLOCK (1 << 2)
 
 
 
@@ -11,7 +11,6 @@ __global__
 void compute_next_layer_distance(int n, int *adjacencyList, int *edgesOffset, int *edgesSize, int *distance, int level, bool *done) {
 	const int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	if (tid < n) {
-		printf("done? %i \n", *done);
 		if (distance[tid] == level) {
 			for (int i = edgesOffset[tid]; i < edgesOffset[tid] + edgesSize[tid]; ++i) {
 				int v = adjacencyList[i];
