@@ -15,7 +15,7 @@ Nvidia paper: https://research.nvidia.com/publication/scalable-gpu-graph-travers
 
 Simple, sequential Breadth First Search has O(|V| + |E|) complexity - we visit every vertex exactly once and every edge at most once. Therefore, it would be desirable for our parallel algorithm to have the same asymptotic complexity. 
 
-At first, we will consider simple parallelization strategy that has the above complexity. In each BFS level it simply traverses all vertexes in the queue in parallel and creates a new queue.
+At first, we will consider quadratic, but sometimes quite effective algorithm. After that, we will consider simple parallelization strategy that has the above complexity. In each BFS level it simply traverses all vertexes in the queue in parallel and creates a new queue. New vertices are added using atomicAdd operation on the position in the output queue in each iteration.
 
 Then, we will try to imlement more sophisticated algorithm. 
 As described in Merill et. al our strategy is following:
@@ -37,7 +37,5 @@ The source code has options to read graphs provided both as AdjacencyList and li
 
 ## Credits
 
-Thanks to:
-
-* D. Merill, M. Garland, A. Grimshaw and their paper "Scalable GPU Graph Traversal" which helped me understand this algorithm
+* D. Merill, M. Garland, A. Grimshaw  "Scalable GPU Graph Traversal": https://research.nvidia.com/publication/scalable-gpu-graph-traversal
 * Github user rafalk342 (https://github.com/rafalk342/bfs-cuda) whose repo helped me get started with implementation of my first code running on GPU with cuda.
