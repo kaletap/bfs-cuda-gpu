@@ -29,6 +29,12 @@ As described in Merill et. al our strategy is following:
 
 * gtest (https://github.com/google/googletest) for testing
 
+## Running instructions:
+1. Compile the program with `./compile`
+2. Run the program inputing data source. For example `./bfs_main < data/4elt.graph`
+
+The source code has options to read graphs provided both as AdjacencyList and list of edges and this is specified by Format argument in a constructor.
+
 ## Credits
 
 Thanks to:
